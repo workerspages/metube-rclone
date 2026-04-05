@@ -1,22 +1,20 @@
 {
-    # PaaS 平台已提供 HTTPS 域名，Caddy 负责自动申请 TLS 证书
-    # admin 接口关闭
     admin off
 }
 
-# PUBLIC_DOMAIN 设置时使用 HTTPS 域名，未设置时退回 HTTP :8080
-{$PUBLIC_DOMAIN:":8080"} {
+# 监听地址占位符，由 entrypoint.sh 在启动前替换
+LISTEN_PLACEHOLDER {
 
-    # /dav/* → rclone WebDAV（认证由 rclone 自身处理）
+    # /dav/* → rclone WebDAV
     handle /dav/* {
         uri strip_prefix /dav
         reverse_proxy 127.0.0.1:8082
     }
 
-    # /* → metube Web UI（Caddy basicauth 保护）
+    # /* → metube Web UI（basicauth 用户名和哈希由 entrypoint.sh 写入）
     handle {
         basicauth {
-            {$UI_USER} {$UI_PASS_HASH}
+            AUTH_PLACEHOLDER
         }
         reverse_proxy 127.0.0.1:8081
     }
