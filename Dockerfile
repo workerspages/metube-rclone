@@ -4,7 +4,7 @@ USER root
 
 # metube 镜像内 /bin/sh 为 dash，无 bash/apk，全部改用静态二进制直接下载
 
-# 安装 rclone（按 TARGETARCH 下载对应静态二进制，无需 bash）
+# 安装 rclone
 ARG TARGETARCH
 ARG RCLONE_VERSION=v1.69.1
 RUN set -eux; \
@@ -21,7 +21,7 @@ RUN set -eux; \
     chmod +x /usr/local/bin/rclone && \
     rm -rf /tmp/rclone.zip /tmp/rclone-tmp
 
-# 安装 Caddy（按 TARGETARCH 下载对应静态二进制）
+# 安装 Caddy
 ARG CADDY_VERSION=2.9.1
 RUN set -eux; \
     case "${TARGETARCH}" in \
@@ -40,10 +40,11 @@ RUN mkdir -p /root/.config/rclone /downloads /data/caddy
 # Caddy 证书持久化目录
 ENV XDG_DATA_HOME=/data
 
-# 将 metube 监听地址固定为 127.0.0.1:8081，避免与 Caddy 的 8080 冲突
-# 这里用 ENV 而不是在 entrypoint.sh 里 export，确保 metube 官方入口就能读到
-ENV LISTEN_HOST=127.0.0.1
-ENV LISTEN_PORT=8081
+# metube 监听地址固定为 127.0.0.1:8081
+# 注意：metube 用的环境变量是 HOST 和 PORT
+# PORT 环境变量不能用于 Caddy 对外端口，需用 CADDY_PORT 区分
+ENV HOST=127.0.0.1
+ENV PORT=8081
 
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY entrypoint.sh /entrypoint-wrapper.sh
