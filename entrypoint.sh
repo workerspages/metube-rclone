@@ -15,7 +15,13 @@ DOWNLOAD_DIR="${DOWNLOAD_DIR:-/downloads}"
 
 # 生成 Caddy basicauth 密码哈希
 echo "[wrapper] Hashing UI password for Caddy basicauth..."
-UI_PASS_HASH=$(caddy hash-password --plaintext "${UI_PASS}")
+UI_PASS_HASH="$(caddy hash-password --plaintext "${UI_PASS}" | tr -d '\r\n')"
+
+# 哈希为空则直接退出，防止认证失效
+if [ -z "${UI_PASS_HASH}" ]; then
+    echo "[wrapper] ERROR: failed to generate Caddy password hash, aborting."
+    exit 1
+fi
 
 # 确保下载目录存在
 mkdir -p "${DOWNLOAD_DIR}"
@@ -41,6 +47,13 @@ echo "[wrapper]  UI User   : ${UI_USER}"
 echo "[wrapper]  DAV User  : ${WEBDAV_USER}"
 echo "[wrapper]  DL Dir    : ${DOWNLOAD_DIR}"
 echo "[wrapper] ============================================"
+
+# 打印最终 Caddyfile，方便调试
+echo "[wrapper] Rendered Caddyfile:"
+cat /etc/caddy/Caddyfile
+
+# 校验 Caddyfile，配置有问题直接退出
+caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 
 # 后台启动 rclone WebDAV
 rclone serve webdav "${DOWNLOAD_DIR}" \
