@@ -1,0 +1,20 @@
+{
+    # 全局配置：关闭自动 HTTPS（PaaS 平台通常由平台层处理 TLS）
+    auto_https off
+    admin off
+}
+
+# 监听统一端口
+:8080 {
+
+    # /dav/* → rclone WebDAV 服务（内部 8082 端口）
+    handle /dav/* {
+        uri strip_prefix /dav
+        reverse_proxy 127.0.0.1:8082
+    }
+
+    # 其余请求 → metube Web UI（内部 8081 端口）
+    handle {
+        reverse_proxy 127.0.0.1:8081
+    }
+}

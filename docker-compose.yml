@@ -5,14 +5,11 @@ services:
     container_name: metube-rclone
     restart: unless-stopped
     ports:
-      - "8081:8081"   # metube Web UI
-      - "8080:8080"   # rclone WebDAV
+      - "8080:8080"   # 唯一对外端口，由 Caddy 统一代理
     volumes:
-      - ./downloads:/downloads   # 持久化下载目录
+      - ./downloads:/downloads
     environment:
-      # metube 配置
+      - PORT=8080              # Caddy 对外监听端口
       - DOWNLOAD_DIR=/downloads
-      # rclone WebDAV 配置
-      - WEBDAV_PORT=8080
-      - WEBDAV_USER=admin          # 修改为你的用户名
-      - WEBDAV_PASS=admin          # 修改为你的密码
+      - WEBDAV_USER=admin      # 修改为你的用户名
+      - WEBDAV_PASS=admin      # 修改为你的密码

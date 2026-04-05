@@ -1,81 +1,72 @@
 # metube-rclone
 
 基于 [ghcr.io/alexta69/metube](https://github.com/alexta69/metube) 镜像构建，
-集成 [rclone](https://rclone.org/) WebDAV 服务器，
-方便通过任意支持 WebDAV 的客户端（如 Cyberduck、Rclone、Alist 等）访问 metube 的下载目录。
+集成 [rclone](https://rclone.org/) WebDAV 与 [Caddy](https://caddyserver.com/) 反向代理，
+**仅暴露单一端口**，适合 PaaS 平台（Railway、Render、Zeabur 等）一端口限制部署。
+
+## 架构
+
+```
+外部请求 → :PORT (Caddy)
+               ├─ /dav/*  → 127.0.0.1:8082 (rclone WebDAV)
+               └─ /*      → 127.0.0.1:8081 (metube Web UI)
+```
+
+所有内部服务仅监听 `127.0.0.1`，对外只有 Caddy 的统一端口可访问。
 
 ## 项目结构
 
 ```
 metube-rclone/
-├── Dockerfile           # 镜像构建文件
-├── entrypoint.sh        # 启动脚本（同时运行 metube 和 rclone WebDAV）
-├── docker-compose.yml   # Compose 一键部署
+├── Dockerfile           # 镜像构建（metube + rclone + Caddy）
+├── Caddyfile            # Caddy 路由配置
+├── entrypoint.sh        # 启动脚本
+├── docker-compose.yml   # 本地 / 自托管一键部署
 └── README.md
 ```
 
 ## 快速部署
 
-### 方式一：docker compose（推荐）
+### docker compose（本地 / 自托管）
 
 ```bash
-# 1. 克隆项目
 git clone https://github.com/workerspages/metube-rclone.git
 cd metube-rclone
-
-# 2. 修改 docker-compose.yml 中的 WEBDAV_USER / WEBDAV_PASS
-
-# 3. 启动
+# 按需修改 docker-compose.yml 中的 WEBDAV_USER / WEBDAV_PASS
 docker compose up -d
 ```
 
-### 方式二：docker run
+### PaaS 平台（Railway / Render / Zeabur 等）
+
+1. 将仓库连接到 PaaS 平台
+2. 平台会自动注入 `$PORT` 环境变量，entrypoint.sh 会自动读取
+3. 设置以下环境变量：
+
+| 变量 | 说明 |
+|------|------|
+| `WEBDAV_USER` | WebDAV 认证用户名 |
+| `WEBDAV_PASS` | WebDAV 认证密码 |
+| `DOWNLOAD_DIR` | 下载目录（默认 `/downloads`）|
+
+## 访问地址
+
+| 功能 | 路径 |
+|------|------|
+| metube Web UI | `http://<host>:<PORT>/` |
+| WebDAV 根目录 | `http://<host>:<PORT>/dav/` |
+
+## 连接 WebDAV 示例
 
 ```bash
-docker build -t metube-rclone .
+# rclone
+rclone copy :webdav,url=http://localhost:8080/dav/,user=admin,pass=admin: ./local-dir
 
-docker run -d \
-  --name metube-rclone \
-  -p 8081:8081 \
-  -p 8080:8080 \
-  -v $(pwd)/downloads:/downloads \
-  -e WEBDAV_USER=admin \
-  -e WEBDAV_PASS=yourpassword \
-  metube-rclone
-```
-
-## 端口说明
-
-| 端口 | 服务 | 说明 |
-|------|------|------|
-| 8081 | metube Web UI | 视频下载界面 |
-| 8080 | rclone WebDAV | 访问下载目录 |
-
-## 环境变量
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `DOWNLOAD_DIR` | `/downloads` | metube 下载目录（同时作为 WebDAV 根目录）|
-| `WEBDAV_PORT` | `8080` | WebDAV 监听端口 |
-| `WEBDAV_USER` | `admin` | WebDAV 认证用户名 |
-| `WEBDAV_PASS` | `admin` | WebDAV 认证密码 |
-
-## 连接 WebDAV
-
-WebDAV 服务地址格式：
-
-```
-http://<host>:8080/
-```
-
-示例（使用 rclone 挂载）：
-
-```bash
-rclone copy :webdav,url=http://localhost:8080,user=admin,pass=admin: ./local-dir
+# macOS Finder / Windows 资源管理器
+# 地址栏输入：http://<host>:8080/dav/
 ```
 
 ## 注意事项
 
-- 部署在 PaaS 平台时，确保 **8081** 和 **8080** 端口均已对外开放。
-- 建议修改默认的 `WEBDAV_USER` 和 `WEBDAV_PASS` 以保障安全。
-- 下载目录 `/downloads` 建议挂载持久化存储，防止容器重启后文件丢失。
+- 请务必修改默认的 `WEBDAV_USER` 和 `WEBDAV_PASS`，避免数据泄露。
+- PaaS 平台通常不提供持久化存储，建议挂载对象存储或使用平台的持久化磁盘。
+- 若平台已提供 HTTPS，Caddy 的 `auto_https off` 可保持不变，TLS 由平台层处理。
