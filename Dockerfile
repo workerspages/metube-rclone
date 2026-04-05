@@ -2,14 +2,26 @@ FROM ghcr.io/alexta69/metube:latest
 
 USER root
 
-# ── 安装依赖（不依赖 apk，全部用静态二进制或官方脚本）──────────
+# metube 镜像内 /bin/sh 为 dash，无 bash/apk，全部改用静态二进制直接下载
 
-# 安装 rclone（官方脚本，自动识别架构，仅依赖 curl）
-# metube 镜像已内置 curl，直接使用
-RUN curl -fsSL https://rclone.org/install.sh | sh
-
-# 安装 Caddy（官方 GitHub Release 静态二进制，按 TARGETARCH 选择）
+# 安装 rclone（按 TARGETARCH 下载对应静态二进制，无需 bash）
 ARG TARGETARCH
+ARG RCLONE_VERSION=v1.69.1
+RUN set -eux; \
+    case "${TARGETARCH}" in \
+        amd64) RCLONE_ARCH="amd64" ;; \
+        arm64) RCLONE_ARCH="arm64" ;; \
+        arm)   RCLONE_ARCH="arm-v7" ;; \
+        *)     echo "Unsupported arch: ${TARGETARCH}"; exit 1 ;; \
+    esac; \
+    curl -fsSL "https://github.com/rclone/rclone/releases/download/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-linux-${RCLONE_ARCH}.zip" \
+        -o /tmp/rclone.zip && \
+    unzip -q /tmp/rclone.zip -d /tmp/rclone-tmp && \
+    mv /tmp/rclone-tmp/rclone-*/rclone /usr/local/bin/rclone && \
+    chmod +x /usr/local/bin/rclone && \
+    rm -rf /tmp/rclone.zip /tmp/rclone-tmp
+
+# 安装 Caddy（按 TARGETARCH 下载对应静态二进制）
 ARG CADDY_VERSION=2.9.1
 RUN set -eux; \
     case "${TARGETARCH}" in \
@@ -19,7 +31,7 @@ RUN set -eux; \
         *)     echo "Unsupported arch: ${TARGETARCH}"; exit 1 ;; \
     esac; \
     curl -fsSL "https://github.com/caddyserver/caddy/releases/download/v${CADDY_VERSION}/caddy_${CADDY_VERSION}_linux_${CADDY_ARCH}.tar.gz" \
-        | tar -xz -C /usr/local/bin caddy; \
+        | tar -xz -C /usr/local/bin caddy && \
     chmod +x /usr/local/bin/caddy
 
 # 创建必要目录
