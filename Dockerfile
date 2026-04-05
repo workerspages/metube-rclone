@@ -16,14 +16,17 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # 创建必要目录
-RUN mkdir -p /root/.config/rclone /downloads
+RUN mkdir -p /root/.config/rclone /downloads /data/caddy
+
+# Caddy 数据目录（存储 ACME 证书）
+ENV XDG_DATA_HOME=/data
 
 # 复制配置文件和启动脚本
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# 仅对外暴露单一端口（由 Caddy 统一代理）
+# 对外暴露单一端口
 EXPOSE 8080
 
 ENTRYPOINT ["/entrypoint.sh"]

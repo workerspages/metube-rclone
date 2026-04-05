@@ -5,11 +5,21 @@ services:
     container_name: metube-rclone
     restart: unless-stopped
     ports:
-      - "8080:8080"   # 唯一对外端口，由 Caddy 统一代理
+      - "8080:8080"
     volumes:
       - ./downloads:/downloads
+      - caddy_data:/data/caddy    # 持久化 Caddy TLS 证书，避免重启后重新申请
     environment:
-      - PORT=8080              # Caddy 对外监听端口
+      - PORT=8080
       - DOWNLOAD_DIR=/downloads
-      - WEBDAV_USER=admin      # 修改为你的用户名
-      - WEBDAV_PASS=admin      # 修改为你的密码
+      # metube Web UI 认证
+      - UI_USER=admin             # 修改为你的用户名
+      - UI_PASS=changeme          # 修改为你的密码（明文，启动时自动哈希）
+      # rclone WebDAV 认证
+      - WEBDAV_USER=admin         # 修改为你的用户名
+      - WEBDAV_PASS=changeme      # 修改为你的密码
+      # PaaS HTTPS 域名（本地部署留空即可）
+      # - PUBLIC_DOMAIN=myapp.railway.app
+
+volumes:
+  caddy_data:

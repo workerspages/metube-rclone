@@ -1,20 +1,23 @@
 {
-    # 全局配置：关闭自动 HTTPS（PaaS 平台通常由平台层处理 TLS）
-    auto_https off
+    # PaaS 平台已提供 HTTPS 域名，Caddy 负责自动申请 TLS 证书
+    # admin 接口关闭
     admin off
 }
 
-# 监听统一端口
-:8080 {
+# PUBLIC_DOMAIN 设置时使用 HTTPS 域名，未设置时退回 HTTP :8080
+{$PUBLIC_DOMAIN:":8080"} {
 
-    # /dav/* → rclone WebDAV 服务（内部 8082 端口）
+    # /dav/* → rclone WebDAV（认证由 rclone 自身处理）
     handle /dav/* {
         uri strip_prefix /dav
         reverse_proxy 127.0.0.1:8082
     }
 
-    # 其余请求 → metube Web UI（内部 8081 端口）
+    # /* → metube Web UI（Caddy basicauth 保护）
     handle {
+        basicauth {
+            {$UI_USER} {$UI_PASS_HASH}
+        }
         reverse_proxy 127.0.0.1:8081
     }
 }
