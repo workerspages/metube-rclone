@@ -1,7 +1,6 @@
 services:
   metube-rclone:
-    build: .
-    image: metube-rclone:latest
+    image: ghcr.io/workerspages/metube-rclone:latest
     container_name: metube-rclone
     restart: unless-stopped
     ports:
