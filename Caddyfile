@@ -1,5 +1,7 @@
 {
     admin off
+    # 禁用 Caddy 自动 HTTPS，Zeabur 外层已经处理 TLS
+    auto_https off
 }
 
 # 监听地址占位符，由 entrypoint.sh 在启动前替换
@@ -11,9 +13,9 @@ LISTEN_PLACEHOLDER {
         reverse_proxy 127.0.0.1:8082
     }
 
-    # /* → metube Web UI（basicauth 用户名和哈希由 entrypoint.sh 写入）
+    # /* → metube Web UI（basic_auth 用户名和哈希由 entrypoint.sh 写入）
     handle {
-        basicauth {
+        basic_auth {
             AUTH_PLACEHOLDER
         }
         reverse_proxy 127.0.0.1:8081
