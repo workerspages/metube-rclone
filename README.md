@@ -1,1 +1,3 @@
-# metube-rclone
+以 ghcr.io/alexta69/metube 镜像为基础构建一个docker项目
+此项目部署在PaaS平台使用
+镜像集成rclone，并使用rclone 生成一个webdav服务器 路径指向 metube 下载目录，方便我使用其它工具能链接此webdav服务器访问或复制metube下载的文件
