@@ -30,7 +30,6 @@ mkdir -p "${DOWNLOAD_DIR}"
 sed -i "s|AUTH_PLACEHOLDER|${UI_USER} ${UI_PASS_HASH}|" /etc/caddy/Caddyfile
 
 # 始终使用端口监听模式，确保 basic_auth 在反向代理后仍然生效
-# 不使用域名 vhost 模式，避免 Zeabur/Railway 等平台内部转发时 Host 头不匹配导致认证跳过
 sed -i "s|LISTEN_PLACEHOLDER|:${PORT}|" /etc/caddy/Caddyfile
 
 if [ -n "${PUBLIC_DOMAIN}" ]; then
@@ -70,7 +69,6 @@ caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
 echo "[wrapper] Caddy started (PID: $!)"
 
 # 直接调用 metube 官方入口脚本
+# LISTEN_HOST=127.0.0.1 和 LISTEN_PORT=8081 已通过 Dockerfile ENV 设定，无需再此 export
 echo "[wrapper] Handing off to metube official entrypoint..."
-export LISTEN_HOST=127.0.0.1
-export LISTEN_PORT=${METUBE_PORT}
 exec /app/docker-entrypoint.sh

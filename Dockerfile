@@ -40,6 +40,11 @@ RUN mkdir -p /root/.config/rclone /downloads /data/caddy
 # Caddy 证书持久化目录
 ENV XDG_DATA_HOME=/data
 
+# 将 metube 监听地址固定为 127.0.0.1:8081，避免与 Caddy 的 8080 冲突
+# 这里用 ENV 而不是在 entrypoint.sh 里 export，确保 metube 官方入口就能读到
+ENV LISTEN_HOST=127.0.0.1
+ENV LISTEN_PORT=8081
+
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY entrypoint.sh /entrypoint-wrapper.sh
 RUN chmod +x /entrypoint-wrapper.sh
