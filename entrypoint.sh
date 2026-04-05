@@ -26,17 +26,18 @@ fi
 # 确保下载目录存在
 mkdir -p "${DOWNLOAD_DIR}"
 
-# 将实际用户名和哈希直接写入 Caddyfile（替换占位符）
+# 将实际用户名和哈希写入 Caddyfile
 sed -i "s|AUTH_PLACEHOLDER|${UI_USER} ${UI_PASS_HASH}|" /etc/caddy/Caddyfile
 
-# 设置监听地址：有域名用 HTTPS，无域名用 HTTP
+# 始终使用端口监听模式，确保 basic_auth 在反向代理后仍然生效
+# 不使用域名 vhost 模式，避免 Zeabur/Railway 等平台内部转发时 Host 头不匹配导致认证跳过
+sed -i "s|LISTEN_PLACEHOLDER|:${PORT}|" /etc/caddy/Caddyfile
+
 if [ -n "${PUBLIC_DOMAIN}" ]; then
-    sed -i "s|LISTEN_PLACEHOLDER|${PUBLIC_DOMAIN}|" /etc/caddy/Caddyfile
-    echo "[wrapper]  Domain    : ${PUBLIC_DOMAIN} (HTTPS auto)"
+    echo "[wrapper]  Domain    : ${PUBLIC_DOMAIN} (HTTPS handled by Zeabur)"
     echo "[wrapper]  UI        : https://${PUBLIC_DOMAIN}/"
     echo "[wrapper]  WebDAV    : https://${PUBLIC_DOMAIN}/dav/"
 else
-    sed -i "s|LISTEN_PLACEHOLDER|:${PORT}|" /etc/caddy/Caddyfile
     echo "[wrapper]  Domain    : (none, HTTP on :${PORT})"
     echo "[wrapper]  UI        : http://localhost:${PORT}/"
     echo "[wrapper]  WebDAV    : http://localhost:${PORT}/dav/"
