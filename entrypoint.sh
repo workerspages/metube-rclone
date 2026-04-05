@@ -53,8 +53,8 @@ echo "[wrapper] rclone WebDAV started (PID: $!)"
 caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
 echo "[wrapper] Caddy started (PID: $!)"
 
-# 交由官方 docker-entrypoint.sh 启动 metube
+# 直接调用 metube 官方入口脚本（tini 在镜像重构后不再存在）
 echo "[wrapper] Handing off to metube official entrypoint..."
 export LISTEN_HOST=127.0.0.1
 export LISTEN_PORT=${METUBE_PORT}
-exec /sbin/tini -g -- /app/docker-entrypoint.sh
+exec /app/docker-entrypoint.sh
