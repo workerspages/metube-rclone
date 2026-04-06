@@ -63,6 +63,8 @@ UI_PASS=yourpassword
 WEBDAV_USER=yourname
 WEBDAV_PASS=yourpassword
 DOWNLOAD_DIR=/downloads
+OUTPUT_TEMPLATE=%(title).100B.%(ext)s
+OUTPUT_TEMPLATE_CHAPTER=%(title)s - %(section_number)s %(section_title)s.%(ext)s
 ```
 
 3. 部署后访问 `https://metube-rclone.zeabur.app/`，浏览器会弹出 Basic Auth 登录框。
