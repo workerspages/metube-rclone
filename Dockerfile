@@ -35,7 +35,7 @@ RUN set -eux; \
     chmod +x /usr/local/bin/caddy
 
 # 创建必要目录
-RUN mkdir -p /root/.config/rclone /downloads /data/caddy
+RUN mkdir -p /root/.config/rclone /downloads/Twitter /downloads/经典 /data/caddy
 
 # Caddy 证书持久化目录
 ENV XDG_DATA_HOME=/data
