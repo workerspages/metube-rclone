@@ -57,7 +57,7 @@ docker compose up -d
 2. 在平台控制台设置以下环境变量（**不要**手动设置 `PORT`）：
 
 ```
-PUBLIC_DOMAIN=myapp.zeabur.app
+PUBLIC_DOMAIN=metube-rclone.zeabur.app
 UI_USER=yourname
 UI_PASS=yourpassword
 WEBDAV_USER=yourname
