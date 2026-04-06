@@ -19,4 +19,4 @@ services:
       - WEBDAV_USER=admin         # 修改为你的用户名
       - WEBDAV_PASS=changeme      # 修改为你的密码
       # PaaS HTTPS 域名（本地部署留空即可）
-      # - PUBLIC_DOMAIN=myapp.zeabur.app
+      # - PUBLIC_DOMAIN=metube-rclone.zeabur.app
