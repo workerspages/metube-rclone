@@ -44,6 +44,11 @@ COPY Caddyfile /etc/caddy/Caddyfile
 COPY entrypoint.sh /entrypoint-wrapper.sh
 RUN chmod +x /entrypoint-wrapper.sh
 
+# 覆盖 metube 基础镜像的 ENV PORT=8081，让 Caddy 默认监听 8080
+# （Zeabur 等 PaaS 平台可能通过 PORT 环境变量注入实际端口）
+ENV PORT=8080
+
 EXPOSE 8080
 
-ENTRYPOINT ["/entrypoint-wrapper.sh"]
+# 使用 tini 作为 PID 1（与 metube 原始镜像一致），确保信号正确传播
+ENTRYPOINT ["/usr/bin/tini", "-g", "--", "/entrypoint-wrapper.sh"]

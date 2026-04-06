@@ -1,10 +1,17 @@
 #!/bin/sh
 set -e
 
+# ================================================================
+# 端口配置说明：
+# metube 基础镜像默认 ENV PORT=8081，Zeabur 也可能通过 PORT 注入端口。
+# CADDY_PORT 使用专用变量名避开冲突，默认值 8080。
+# MeTube 内部端口硬编码 8083，确保与 Caddy/WebDAV 完全隔离。
+# ================================================================
+
 # 环境变量配置
 PUBLIC_DOMAIN="${PUBLIC_DOMAIN:-}"
-# Caddy 对外监听端口：Zeabur 会强制注入 PORT 变量，所以用专用 CADDY_PORT 避开冲突
-CADDY_PORT="${PORT:-8080}"
+# Caddy 对外监听端口：优先使用 CADDY_PORT，否则用 PORT，最后回退到 8080
+CADDY_PORT="${CADDY_PORT:-${PORT:-8080}}"
 WEBDAV_PORT="8082"
 
 WEBDAV_USER="${WEBDAV_USER:-admin}"
@@ -14,7 +21,6 @@ UI_PASS="${UI_PASS:-admin}"
 DOWNLOAD_DIR="${DOWNLOAD_DIR:-/downloads}"
 
 # metube 内部端口硬编码为 8083，避免与 Caddy 监听端口冲突
-# （Zeabur 可能注入 PORT=8081，所以不能使用 8081）
 METUBE_HOST="127.0.0.1"
 METUBE_PORT="8083"
 
@@ -69,7 +75,7 @@ echo "[wrapper] rclone WebDAV started (PID: $!)"
 caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
 echo "[wrapper] Caddy started (PID: $!)"
 
-# 通过环境变量强制覆盖 metube 监听地址，使用 HOST/PORT 变量名（metube 原生变量）
+# 通过环境变量强制覆盖 metube 监听地址
 export HOST="${METUBE_HOST}"
 export PORT="${METUBE_PORT}"
 echo "[wrapper] Handing off to metube official entrypoint (HOST=${HOST} PORT=${PORT})..."
