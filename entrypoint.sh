@@ -24,6 +24,16 @@ DOWNLOAD_DIR="${DOWNLOAD_DIR:-/downloads}"
 METUBE_HOST="127.0.0.1"
 METUBE_PORT="8083"
 
+echo "Initializing directories..."
+# 每次容器启动时，检测并创建这些子目录
+# 因为你在 Dockerfile 开头写了 USER root，这里是以 root 身份执行，不会报错
+mkdir -p /downloads/Twitter
+mkdir -p /downloads/经典
+
+# 可选：如果你担心权限问题导致 metube 无法写入，可以顺手赋权
+chmod 777 /downloads/Twitter
+chmod 777 /downloads/经典
+
 echo "[wrapper] Caddy will listen on :${CADDY_PORT}"
 echo "[wrapper] MeTube internal: ${METUBE_HOST}:${METUBE_PORT}"
 
