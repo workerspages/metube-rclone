@@ -65,7 +65,7 @@ WEBDAV_PASS=yourpassword
 DOWNLOAD_DIR=/downloads
 ```
 
-3. 部署后访问 `https://myapp.zeabur.app/`，浏览器会弹出 Basic Auth 登录框。
+3. 部署后访问 `https://metube-rclone.zeabur.app/`，浏览器会弹出 Basic Auth 登录框。
 
 ### 其他 PaaS 平台（Railway / Render 等）
 
@@ -84,7 +84,7 @@ DOWNLOAD_DIR=/downloads
 
 ```bash
 # rclone
-rclone copy :webdav,url=https://myapp.zeabur.app/dav/,user=yourname,pass=yourpassword: ./local-dir
+rclone copy :webdav,url=https://metube-rclone.zeabur.app/dav/,user=yourname,pass=yourpassword: ./local-dir
 
 # macOS Finder / Windows 资源管理器 / Cyberduck
 # 地址：https://myapp.zeabur.app/dav/
