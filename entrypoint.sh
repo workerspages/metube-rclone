@@ -66,6 +66,7 @@ caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 
 rclone serve webdav "${DOWNLOAD_DIR}" \
     --addr "127.0.0.1:${WEBDAV_PORT}" \
+    --baseurl /dav \
     --user "${WEBDAV_USER}" \
     --pass "${WEBDAV_PASS}" \
     --vfs-cache-mode full \

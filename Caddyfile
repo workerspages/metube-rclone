@@ -9,7 +9,6 @@ LISTEN_PLACEHOLDER {
 
     # /dav/* → rclone WebDAV
     handle /dav/* {
-        uri strip_prefix /dav
         reverse_proxy 127.0.0.1:8082
     }
 
