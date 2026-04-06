@@ -13,9 +13,10 @@ UI_USER="${UI_USER:-admin}"
 UI_PASS="${UI_PASS:-admin}"
 DOWNLOAD_DIR="${DOWNLOAD_DIR:-/downloads}"
 
-# metube 内部端口硬编码为 8081，避免被 Zeabur 强制注入的 PORT 变量覆盖
+# metube 内部端口硬编码为 8083，避免与 Caddy 监听端口冲突
+# （Zeabur 可能注入 PORT=8081，所以不能使用 8081）
 METUBE_HOST="127.0.0.1"
-METUBE_PORT="8081"
+METUBE_PORT="8083"
 
 echo "[wrapper] Caddy will listen on :${CADDY_PORT}"
 echo "[wrapper] MeTube internal: ${METUBE_HOST}:${METUBE_PORT}"
@@ -33,8 +34,8 @@ mkdir -p "${DOWNLOAD_DIR}"
 
 sed -i "s|AUTH_PLACEHOLDER|${UI_USER} ${UI_PASS_HASH}|" /etc/caddy/Caddyfile
 sed -i "s|LISTEN_PLACEHOLDER|:${CADDY_PORT}|" /etc/caddy/Caddyfile
-# 将 Caddyfile 中 metube 的内部地址改为硬编码的 8081
-# (Caddyfile 中已是 127.0.0.1:8081，无需替换)
+# 将 Caddyfile 中 metube 的反向代理地址占位符替换为实际的 MeTube 端口
+sed -i "s|METUBE_PROXY_PLACEHOLDER|${METUBE_HOST}:${METUBE_PORT}|" /etc/caddy/Caddyfile
 
 if [ -n "${PUBLIC_DOMAIN}" ]; then
     echo "[wrapper]  Domain    : ${PUBLIC_DOMAIN} (HTTPS handled by Zeabur)"

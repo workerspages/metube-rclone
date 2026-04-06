@@ -12,7 +12,7 @@
 ```
 外部请求 → :PORT (Caddy 对外监听)
                ├─ /dav/*  → 127.0.0.1:8082 (rclone WebDAV，rclone 自身认证)
-               └─ /*      → 127.0.0.1:8081 (metube Web UI，Caddy basicauth 保护)
+               └─ /*      → 127.0.0.1:8083 (metube Web UI，Caddy basicauth 保护)
 ```
 
 ## 项目结构
@@ -38,7 +38,7 @@ metube-rclone/
 | `WEBDAV_PASS` | `admin` | WebDAV 认证密码 |
 | `DOWNLOAD_DIR` | `/downloads` | 下载目录（同时作为 WebDAV 根目录）|
 
-> **注意**：`PORT` 变量由 PaaS 平台自动提供，metube 内部根掛在 `127.0.0.1:8081`，两者内部已自动隔离，无需额外配置。
+> **注意**：`PORT` 变量由 PaaS 平台自动提供，metube 内部端口硬编码为 `127.0.0.1:8083`，与 Caddy 监听端口自动隔离，无需额外配置。
 
 ## 快速部署
 
