@@ -20,3 +20,6 @@ services:
       - WEBDAV_PASS=changeme      # 修改为你的密码
       # PaaS HTTPS 域名（本地部署留空即可）
       # - PUBLIC_DOMAIN=metube-rclone.zeabur.app
+
+      - OUTPUT_TEMPLATE=%(title).100B.%(ext)s
+      - OUTPUT_TEMPLATE_CHAPTER=%(title)s - %(section_number)s %(section_title)s.%(ext)s
