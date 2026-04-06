@@ -7,8 +7,8 @@
 # 监听地址占位符，由 entrypoint.sh 在启动前替换
 LISTEN_PLACEHOLDER {
 
-    # /dav/* → rclone WebDAV
-    handle /dav/* {
+    # /dav* → rclone WebDAV (兼容末尾没有 / 的客户端，如 rclone CLI)
+    handle /dav* {
         reverse_proxy 127.0.0.1:8082
     }
 
