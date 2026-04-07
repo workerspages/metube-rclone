@@ -33,6 +33,7 @@ mkdir -p /downloads/经典
 mkdir -p /downloads/电影
 
 # 可选：如果你担心权限问题导致 metube 无法写入，可以顺手赋权
+chmod 777 /downloads
 chmod 777 /downloads/Twitter
 chmod 777 /downloads/经典
 chmod 777 /downloads/电影
