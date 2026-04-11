@@ -1,0 +1,42 @@
+{
+  "SponsorBlock (跳过赞助与互动片段)": {
+    "postprocessors": [
+      {
+        "key": "SponsorBlock",
+        "categories": [
+          "sponsor",
+          "selfpromo",
+          "interaction"
+        ]
+      }
+    ],
+    "modify_chapters": "-sponsorblock_chapters"
+  },
+  "Embed-Subs (自动下载并嵌入中英字幕)": {
+    "writesubtitles": true,
+    "subtitleslangs": [
+      "en",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "postprocessors": [
+      {
+        "key": "FFmpegEmbedSubtitle",
+        "already_have_subtitle": false
+      }
+    ]
+  },
+  "Audio-MP3 (强制转换为MP3纯音频)": {
+    "format": "bestaudio/best",
+    "postprocessors": [
+      {
+        "key": "FFmpegExtractAudio",
+        "preferredcodec": "mp3",
+        "preferredquality": "192"
+      }
+    ]
+  },
+  "Limit-Rate (限制下载速度为 5MB/s)": {
+    "ratelimit": 5000000
+  }
+}
