@@ -46,7 +46,6 @@ RUN chmod +x /entrypoint-wrapper.sh
 
 # Option Presets (预设)
 COPY presets.json /config/presets.json
-RUN chmod +x /config/presets.json
 
 # 覆盖 metube 基础镜像的 ENV PORT=8081，让 Caddy 默认监听 8080
 # （Zeabur 等 PaaS 平台可能通过 PORT 环境变量注入实际端口）
