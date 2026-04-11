@@ -49,6 +49,17 @@ COPY presets.json /config/presets.json
 # 让 MeTube 自动读取并应用该预设文件
 ENV YTDL_OPTIONS_PRESETS_FILE=/config/presets.json
 
+# 常用环境变量
+# 允许同时进行的最大下载数量
+ENV MAX_CONCURRENT_DOWNLOADS=5
+# 自动从“已完成”列表中移除已完成（和失败）下载记录的等待秒数。默认值：0（禁用自动清除）
+ENV CLEAR_COMPLETED_AFTER=0
+# 是否支持自动创建不存在的子目录。启用后，你可以直接在下拉框输入文字，MeTube 会自动创建该目录。默认值：true
+ENV CREATE_CUSTOM_DIRS=true
+# 是否在 UI 的高级选项中显示一个输入框，允许用户每次下载时手动覆盖/写入特定选项。默认值：false（开启此项有执行任意命令的安全风险，仅限信任环境使用）。
+ENV ALLOW_YTDL_OPTIONS_OVERRIDES=false
+
+
 # 覆盖 metube 基础镜像的 ENV PORT=8081，让 Caddy 默认监听 8080
 # （Zeabur 等 PaaS 平台可能通过 PORT 环境变量注入实际端口）
 ENV PORT=8080
