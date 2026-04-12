@@ -40,6 +40,7 @@ metube-rclone/
 
 > **注意**：`PORT` 变量由 PaaS 平台自动提供，metube 内部端口硬编码为 `127.0.0.1:8083`，与 Caddy 监听端口自动隔离，无需额外配置。
 
+ [MeTube 官方变量](/metube-environment.md) 
 ## 快速部署
 
 ### docker compose（本地 / 自托管）
