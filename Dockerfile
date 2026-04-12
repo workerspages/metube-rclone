@@ -58,8 +58,6 @@ ENV CLEAR_COMPLETED_AFTER=0
 ENV CREATE_CUSTOM_DIRS=true
 # 是否在 UI 的高级选项中显示一个输入框，允许用户每次下载时手动覆盖/写入特定选项。默认值：false（开启此项有执行任意命令的安全风险，仅限信任环境使用）。
 ENV ALLOW_YTDL_OPTIONS_OVERRIDES=false
-# 在服务器端全局锁死 MP4 格式（适合多端多设备频繁切换）
-ENV YTDL_OPTIONS='{"format":"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}'
 
 # 覆盖 metube 基础镜像的 ENV PORT=8081，让 Caddy 默认监听 8080
 # （Zeabur 等 PaaS 平台可能通过 PORT 环境变量注入实际端口）
