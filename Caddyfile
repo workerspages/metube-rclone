@@ -7,6 +7,11 @@
 # 监听地址占位符，由 entrypoint.sh 在启动前替换
 LISTEN_PLACEHOLDER {
 
+    # 专门用于 run.claw.cloud 等 PaaS 平台的健康检查端点 (返回 200 OK，免密)
+    handle /health {
+        respond "OK" 200
+    }
+
     # /dav* → rclone WebDAV (兼容末尾没有 / 的客户端，如 rclone CLI)
     handle /dav* {
         reverse_proxy 127.0.0.1:8082
