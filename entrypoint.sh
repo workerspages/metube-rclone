@@ -31,12 +31,16 @@ mkdir -p /downloads
 mkdir -p /downloads/Twitter
 mkdir -p /downloads/经典
 mkdir -p /downloads/电影
+mkdir -p /downloads/YouTube
+mkdir -p /downloads/教程
 
 # 可选：如果你担心权限问题导致 metube 无法写入，可以顺手赋权
 chmod 777 /downloads
 chmod 777 /downloads/Twitter
 chmod 777 /downloads/经典
 chmod 777 /downloads/电影
+chmod 777 /downloads/YouTube
+chmod 777 /downloads/教程
 
 echo "[wrapper] Caddy will listen on :${CADDY_PORT}"
 echo "[wrapper] MeTube internal: ${METUBE_HOST}:${METUBE_PORT}"
