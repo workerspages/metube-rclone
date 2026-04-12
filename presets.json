@@ -38,5 +38,8 @@
   },
   "Limit-Rate (限制下载速度为 5MB/s)": {
     "ratelimit": 5000000
+  },
+  "Video-MP4 (强制下载MP4格式)": {
+    "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
   }
 }
