@@ -7,7 +7,7 @@ services:
       - "8080:8080"
     volumes:
       - ./downloads:/downloads
-      - ./caddy_data:/data/caddy    # 持久化 Caddy 数据，避免重启后重复申请证书
+      - ./caddy_data:/data        # 持久化 Caddy 数据，避免重启后重复申请证书
     environment:
       # Caddy 对外监听端口（本地部署时使用，PaaS 平台由平台自动注入）
       - PORT=8080
