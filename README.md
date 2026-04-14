@@ -69,7 +69,9 @@ OUTPUT_TEMPLATE_CHAPTER=%(title)s - %(section_number)s %(section_title)s.%(ext)s
 ```
 
 3. 部署后访问 `https://metube-rclone.zeabur.app/`，浏览器会弹出 Basic Auth 登录框。
-4. Uptime Kuma 监听 URL `https://metube-rclone.zeabur.app/health`
+
+### Uptime Kuma 监听 URL
+1. Uptime Kuma 监听 URL `https://metube-rclone.zeabur.app/health`
 
 ### 其他 PaaS 平台（Railway / Render 等）
 
