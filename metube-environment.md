@@ -52,3 +52,164 @@
 * **`ENABLE_ACCESSLOG`**: 是否启用 Web 访问请求日志。默认值：`false`。
 
 这些变量都可以直接添加到你 `docker-compose.yml` 文件的 `environment:` 列表，或者在 Dockerfile 里用 `ENV` 命令声明。
+
+---
+
+
+
+# Custom yt-dlp Options
+**“Custom yt-dlp Options”（自定义 yt-dlp 选项）** 是 MeTube 中非常强大的一个高级功能。
+
+### 💡 它有什么用？
+
+MeTube 本质上是一个提供图形界面的“套壳”程序，它真正在后台执行下载任务的核心引擎是 **`yt-dlp`**。
+因为 `yt-dlp` 拥有成百上千种极其强大的功能（比如内嵌字幕、下载封面、限制网速、使用特定代理等），MeTube 的网页界面不可能把所有功能都做成按钮。
+
+这个输入框的作用就是提供一个**“后门”**，让你能够绕过 MeTube 界面的限制，直接向底层的 `yt-dlp` 引擎发送高级指令，实现那些界面上没有提供的下载需求。
+
+---
+
+### 🛠️ 怎么用？
+
+这个框不能随便输入普通的文字，它**必须严格遵守 JSON 格式**（键值对格式），并且使用的参数名称必须是 `yt-dlp` 的 Python API 参数名（而不是你在命令行里敲的横杠参数，例如不是 `--write-sub`，而是 `"writesubtitles"`）。
+
+**基本语法格式：**
+`{"参数名": 参数值}`
+如果有多个参数，用逗号隔开：`{"参数名1": 参数值1, "参数名2": 参数值2}`
+
+#### 常见的实用示例（直接复制粘贴到该框中即可）：
+
+1. **下载视频自带字幕**（这也是输入框自带的提示例子）：
+   ```json
+   {"writesubtitles": true}
+   ```
+
+2. **下载 YouTube 自动生成的机翻字幕**：
+   ```json
+   {"writeautomaticsub": true}
+   ```
+
+3. **下载视频封面（缩略图）**：
+   ```json
+   {"writethumbnail": true}
+   ```
+
+4. **限制下载速度**（例如限制为 1MB/s，单位是字节 bytes，1MB = 1048576 bytes）：
+   ```json
+   {"ratelimit": 1048576}
+   ```
+
+5. **为下载设置专属代理**（如果某些视频限制地区，可以单独指定代理）：
+   ```json
+   {"proxy": "http://127.0.0.1:7890"}
+   ```
+
+6. **内嵌元数据**（将视频标题、作者等信息直接写进视频文件的属性里）：
+   ```json
+   {"postprocessors": [{"key": "FFmpegMetadata"}]}
+   ```
+
+7. **组合使用**（同时下载字幕、封面并限制网速）：
+   ```json
+   {"writesubtitles": true, "writethumbnail": true, "ratelimit": 1048576}
+   ```
+
+
+
+这里再为你整理一波 **更进阶、更实用的 yt-dlp JSON 参数配置**。
+
+---
+
+### 1. 📝 字幕与信息提取进阶
+
+*   **只下载特定语言的字幕（如中文和英文）**
+    如果你开启了下载字幕，但不想把视频自带的几十种语言全下载下来，可以指定语言代码：
+    ```json
+    {"writesubtitles": true, "subtitleslangs":["zh-Hans", "zh-Hant", "en"]}
+    ```
+    *(注：`zh-Hans`为简体，`zh-Hant`为繁体，`en`为英语。支持正则表达式，比如写成 `["zh.*", "en"]` 就能匹配所有中文和英文)*
+
+*   **将字幕直接“内嵌”到视频文件中（硬/软字幕）**
+    默认情况下下载字幕会生成一个单独的 `.vtt` 或 `.srt` 文件。如果你希望字幕和视频合并成一个文件（方便在各种播放器或电视上播放），可以使用后期处理：
+    ```json
+    {"writesubtitles": true, "postprocessors": [{"key": "FFmpegEmbedSubtitle"}]}
+    ```
+
+*   **下载视频的简介（Description）**
+    有时候某些教程视频的简介里有很多有用的链接或时间轴，你可以将其保存为一个单独的 `.description` 文本文件：
+    ```json
+    {"writedescription": true}
+    ```
+
+*   **下载视频的所有评论（保存到 JSON 数据中）**
+    如果你有做数据分析的需求，这个选项可以把评论抓取下来（保存在 `.info.json` 文件里）：
+    ```json
+    {"writeinfojson": true, "getcomments": true}
+    ```
+
+---
+
+### 2. 🗂️ 播放列表（Playlist）精确控制
+
+虽然 MeTube 界面上有 `Items Limit`（限制数量），但如果你想更精确地控制：
+
+*   **只下载播放列表中的第 5 集 到 第 10 集**
+    ```json
+    {"playliststart": 5, "playlistend": 10}
+    ```
+
+*   **倒序下载播放列表（从最新一集开始下载）**
+    很多播客或连载默认是从最老的一期开始排的，用这个可以反过来：
+    ```json
+    {"playlistreverse": true}
+    ```
+
+---
+
+### 3. 🛡️ 网络防封禁与文件处理
+
+*   **随机延迟下载（防封 IP）**
+    如果你在下载一个包含几百个视频的大型播放列表，频繁的请求可能会被 YouTube 暂时封禁 IP。加入随机休眠时间可以模拟人类操作：
+    ```json
+    {"sleep_interval": 3, "max_sleep_interval": 8}
+    ```
+    *(意思是在下载每个视频之间，随机暂停 3 到 8 秒)*
+
+*   **强制纯英文/数字安全文件名（去除特殊字符和 Emoji）**
+    有时候视频标题里全是各种奇奇怪怪的 Emoji 或者特殊符号，可能导致一些老旧系统的播放器或 NAS 无法读取文件。开启此项会把文件名净化为纯 ASCII 字符：
+    ```json
+    {"restrictfilenames": true}
+    ```
+
+---
+
+### 4. 🚀 黑科技：自动跳过/删除视频内的“恰饭广告” (SponsorBlock)
+
+这是一个非常强大的功能！`yt-dlp` 内置了对 **SponsorBlock**（一个由社区维护的浏览器插件数据库，专门标记视频中 YouTuber 自己插入的口播广告、求订阅片段等）的支持。
+
+*   **在下载时直接把“口播广告”片段剪掉：**
+    ```json
+    {"postprocessors":[{"key": "SponsorBlock", "categories": ["sponsor", "selfpromo"]}]}
+    ```
+    *(执行这个操作后，下载下来的视频会自动切除掉 `sponsor`（赞助商广告）和 `selfpromo`（UP主自我推销）的片段。)*
+
+---
+
+### 💡 终极组合技演示
+
+如果你想**“下载一个有几十集的中文教程播放列表的第1-5集，限制文件名不带乱码，合并中英文字幕到视频里，并每下载完一个随机休息几秒防止被封”**，你可以把它们组合成一条完美的配置：
+
+```json
+{
+  "playliststart": 1,
+  "playlistend": 5,
+  "restrictfilenames": true,
+  "writesubtitles": true,
+  "subtitleslangs": ["zh.*", "en"],
+  "postprocessors": [{"key": "FFmpegEmbedSubtitle"}],
+  "sleep_interval": 2,
+  "max_sleep_interval": 5
+}
+```
+*(直接将上面这段完整复制粘贴到 MeTube 的框里，就可以实现如此复杂的自动化下载流程了)*
+你可以根据需求，直接将下面的 JSON 代码复制到 **“Custom yt-dlp Options”** 框中（注意：可以把多个参数组合在一个大括号 `{}` 里使用逗号分隔）。
