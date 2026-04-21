@@ -41,5 +41,8 @@
   },
   "Video-MP4 (强制下载MP4格式)": {
     "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
+  },
+  "强制纯英文/数字安全文件名（去除特殊字符和 Emoji）": {
+    "restrictfilenames": "true"
   }
 }
